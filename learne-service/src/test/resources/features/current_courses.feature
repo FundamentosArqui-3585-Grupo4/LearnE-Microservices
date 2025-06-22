@@ -18,12 +18,17 @@ Feature: Visualización de cursos en progreso en la pantalla de inicio
       | Progreso actual    |
       | Botón "Continuar"  |
 
-  Scenario: Continuar curso desde la tarjeta
-    Given el curso "Fundamentos de Java" aparece en el carrusel
-    When el alumno hace clic en "Continuar"
-    Then es redirigido directamente al contenido del curso
+Scenario: Continuar curso desde la tarjeta
+  Given el alumno ha iniciado sesión
+  And está inscrito en al menos un curso en progreso
+  When el sistema carga su lista de cursos en progreso
+  And el curso "Fundamentos de Java" aparece en el carrusel
+  When el alumno hace clic en "Continuar"
+  Then es redirigido directamente al contenido del curso
 
-  Scenario: Sin cursos en progreso
-    Given el alumno no está inscrito en ningún curso
-    When accede a la pantalla de inicio
-    Then el sistema muestra un mensaje: "Aún no tienes cursos en progreso"
+
+Scenario: Sin cursos en progreso
+  Given el alumno no está inscrito en ningún curso
+  When el alumno accede a la pantalla de inicio
+  And el sistema carga su lista de cursos en progreso
+  Then el sistema muestra un mensaje: "Aún no tienes cursos en progreso"
