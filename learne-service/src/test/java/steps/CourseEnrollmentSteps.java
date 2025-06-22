@@ -29,8 +29,9 @@ public class CourseEnrollmentSteps {
         cursoSeleccionado = "Fundamentos de Java".equals(nombreCurso);
     }
 
-    @Cuando("hace clic en el botón {string}")
-    public void haceClicEnInscribirse(String boton) {
+
+    @Cuando("hace clic en el botón Inscribirse")
+    public void hace_clic_en_el_boton_inscribirse() {
         if (errorRed) {
             mensaje = "error de red";
             inscrito = false;
@@ -39,7 +40,7 @@ public class CourseEnrollmentSteps {
             mensaje = "Ya estás inscrito en este curso";
             inscrito = false;
             cursoEnListaActual = true;
-        } else if (cursoSeleccionado && "Inscribirse".equals(boton)) {
+        } else if (cursoSeleccionado) {
             inscrito = true;
             mensaje = "confirmación";
             cursoEnListaActual = true;
@@ -71,7 +72,9 @@ public class CourseEnrollmentSteps {
 
     @Cuando("accede nuevamente a la página del curso")
     public void accedeNuevamentePaginaCurso() {
-        // No se requiere acción extra, el estado ya está preparado
+        if (yaInscrito) {
+            mensaje = "Ya estás inscrito en este curso";
+        }
     }
 
     @Entonces("el sistema desactiva el botón de inscripción")

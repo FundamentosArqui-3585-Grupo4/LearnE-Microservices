@@ -11,7 +11,7 @@ Feature: Inscripción a un curso
 
   Scenario: Inscripción exitosa a un curso
     Given el alumno selecciona el curso "Fundamentos de Java"
-    When hace clic en el botón "Inscribirse"
+    When hace clic en el botón Inscribirse
     Then el sistema lo registra como estudiante del curso
     And le muestra un mensaje de confirmación
     And el curso aparece en su lista de cursos actuales
@@ -24,5 +24,5 @@ Feature: Inscripción a un curso
 
   Scenario: Error al inscribirse sin conexión
     Given el alumno pierde conexión a internet al intentar inscribirse
-    When hace clic en "Inscribirse"
+    When hace clic en el botón Inscribirse
     Then el sistema muestra un mensaje de error de red
