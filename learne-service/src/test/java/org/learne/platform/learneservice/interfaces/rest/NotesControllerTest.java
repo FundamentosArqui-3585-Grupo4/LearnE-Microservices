@@ -14,12 +14,15 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -38,7 +41,7 @@ class NotesControllerTest {
     @Autowired
     private NotesRepository notesRepository;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
     @Autowired
@@ -55,6 +58,14 @@ class NotesControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Configurar el mock para asignar IDs al guardar usuarios
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            if (u.getType_user() == 1) u.setId(1L); // Profesor
+            else u.setId(2L); // Estudiante
+            return u;
+        });
+
         // Crear profesor
         User teacher = new User();
         teacher.setFirstName("Juan");

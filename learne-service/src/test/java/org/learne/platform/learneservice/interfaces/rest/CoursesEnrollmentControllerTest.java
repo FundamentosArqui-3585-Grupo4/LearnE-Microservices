@@ -30,14 +30,37 @@ class CoursesEnrollmentControllerTest {
 
     @BeforeEach
     void setup() {
+        jdbcTemplate.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id BIGINT PRIMARY KEY,
+            first_name VARCHAR(255),
+            last_name VARCHAR(255),
+            username VARCHAR(255),
+            email VARCHAR(255),
+            password VARCHAR(255)
+        )
+    """);
+        jdbcTemplate.execute("""
+        CREATE TABLE IF NOT EXISTS courses (
+            id BIGINT PRIMARY KEY,
+            title VARCHAR(255),
+            description VARCHAR(255),
+            teacher_id BIGINT,
+            level VARCHAR(255),
+            duration VARCHAR(255),
+            prior_knowledge VARCHAR(255),
+            principal_image VARCHAR(255),
+            url_video VARCHAR(255)
+        )
+    """);
         jdbcTemplate.update("""
-            INSERT IGNORE INTO users (id, first_name, last_name, username, email, password)
-            VALUES (1, 'Mateo', 'Vilchez', 'mateo123', 'mateo@test.com', 'pass')
-        """);
+        INSERT IGNORE INTO users (id, first_name, last_name, username, email, password)
+        VALUES (1, 'Mateo', 'Vilchez', 'mateo123', 'mateo@test.com', 'pass')
+    """);
         jdbcTemplate.update("""
-            INSERT IGNORE INTO courses (id, title, description, teacher_id, level, duration, prior_knowledge, principal_image, url_video)
-            VALUES (1, 'Test Course', 'Desc', 1, 'Basic', '2h', 'None', 'img.jpg', 'video.mp4')
-        """);
+        INSERT IGNORE INTO courses (id, title, description, teacher_id, level, duration, prior_knowledge, principal_image, url_video)
+        VALUES (1, 'Test Course', 'Desc', 1, 'Basic', '2h', 'None', 'img.jpg', 'video.mp4')
+    """);
 
         resource = new CreateCoursesEnrollmentResource(1L, 1L);
     }

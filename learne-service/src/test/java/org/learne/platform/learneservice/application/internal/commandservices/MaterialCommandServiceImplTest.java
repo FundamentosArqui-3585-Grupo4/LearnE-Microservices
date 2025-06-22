@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -29,36 +30,41 @@ class MaterialCommandServiceImplTest {
     @Autowired
     private CourseRepository courseRepository;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
     private Long courseId;
 
-    @BeforeEach
-    void setUp() {
-        User teacher = new User();
-        teacher.setFirstName("John");
-        teacher.setLastName("Doe");
-        teacher.setUsername("jdoe");
-        teacher.setEmail("jdoe@example.com");
-        teacher.setPassword("secure123");
-        teacher.setType_user(1);
-        teacher.setType_plan(1);
-        teacher = userRepository.save(teacher);
+@BeforeEach
+void setUp() {
+    User teacher = new User();
+    teacher.setFirstName("John");
+    teacher.setLastName("Doe");
+    teacher.setUsername("jdoe");
+    teacher.setEmail("jdoe@example.com");
+    teacher.setPassword("secure123");
+    teacher.setType_user(1);
+    teacher.setType_plan(1);
+    teacher.setId(1L); // Asigna un ID simulado
 
-        Course course = new Course();
-        course.setTitle("Curso de prueba");
-        course.setDescription("Descripción");
-        course.setLevel("Básico");
-        course.setDuration("1h");
-        course.setPrior_knowledge("Nada");
-        course.setPrincipal_image("img.png");
-        course.setUrl_video("https://video.test");
-        course.setTeacherId(teacher.getId());
+    // Configura el mock para devolver el usuario con ID cuando se guarde
+    when(userRepository.save(org.mockito.ArgumentMatchers.any(User.class))).thenReturn(teacher);
 
-        course = courseRepository.save(course);
-        courseId = course.getId();
-    }
+    teacher = userRepository.save(teacher);
+
+    Course course = new Course();
+    course.setTitle("Curso de prueba");
+    course.setDescription("Descripción");
+    course.setLevel("Básico");
+    course.setDuration("1h");
+    course.setPrior_knowledge("Nada");
+    course.setPrincipal_image("img.png");
+    course.setUrl_video("https://video.test");
+    course.setTeacherId(teacher.getId());
+
+    course = courseRepository.save(course);
+    courseId = course.getId();
+}
 
     @Test
     void handle_shouldCreateMaterialSuccessfully() {

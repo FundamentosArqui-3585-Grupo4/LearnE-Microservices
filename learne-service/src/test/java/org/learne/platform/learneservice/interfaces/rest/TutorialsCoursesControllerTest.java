@@ -13,11 +13,14 @@ import org.learne.platform.profileservice.infrastructure.persistence.jpa.UserRep
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TutorialsCoursesControllerTest {
@@ -28,7 +31,7 @@ public class TutorialsCoursesControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
     @Autowired
@@ -45,6 +48,13 @@ public class TutorialsCoursesControllerTest {
     void setup() {
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Configura el mock para asignar IDs al guardar usuarios
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            u.setId(System.currentTimeMillis()); // Simula un ID único
+            return u;
+        });
 
         // Teacher
         User teacher = new User();
@@ -117,15 +127,16 @@ public class TutorialsCoursesControllerTest {
     void updateTutorialCourse_shouldReturn200() {
         Long tutorialId = createTutorial();
 
-        UpdateTutorialsCoursesResource update = new UpdateTutorialsCoursesResource(1L, 2L, "2025-12-02", "11:00", true,"https://zoom.us/updated"
+        UpdateTutorialsCoursesResource update = new UpdateTutorialsCoursesResource(
+            courseId, teacherId, "2025-12-02", "11:00", true, "https://zoom.us/updated"
         );
 
         HttpEntity<UpdateTutorialsCoursesResource> request = new HttpEntity<>(update, headers);
         ResponseEntity<TutorialsCoursesResource> response = restTemplate.exchange(
-                getBaseUrl() + "/" + tutorialId,
-                HttpMethod.PUT,
-                request,
-                TutorialsCoursesResource.class
+            getBaseUrl() + "/" + tutorialId,
+            HttpMethod.PUT,
+            request,
+            TutorialsCoursesResource.class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -134,7 +145,6 @@ public class TutorialsCoursesControllerTest {
         assertEquals("11:00", response.getBody().hour());
         assertTrue(response.getBody().is_reservated());
     }
-
     private Long createTutorial() {
         CreateTutorialsCoursesResource resource = new CreateTutorialsCoursesResource(
                 courseId, teacherId, "2025-12-01", "10:00", false, "https://zoom.us/test"

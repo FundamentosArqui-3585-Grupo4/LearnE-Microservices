@@ -13,6 +13,7 @@ import org.learne.platform.profileservice.infrastructure.persistence.jpa.UserRep
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
@@ -21,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TutorialsReservatedControllerTest {
@@ -31,7 +34,7 @@ public class TutorialsReservatedControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
     @Autowired
@@ -48,6 +51,14 @@ public class TutorialsReservatedControllerTest {
     void setup() {
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Configura el mock para asignar IDs
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            if (u.getType_user() == 1) u.setId(1L); // Profesor
+            else u.setId(2L); // Estudiante
+            return u;
+        });
 
         // Student
         User student = new User();

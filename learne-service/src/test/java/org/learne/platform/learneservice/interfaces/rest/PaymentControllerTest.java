@@ -9,11 +9,14 @@ import org.learne.platform.profileservice.infrastructure.persistence.jpa.UserRep
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PaymentControllerTest {
@@ -24,7 +27,7 @@ public class PaymentControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
     @Autowired
@@ -34,6 +37,13 @@ public class PaymentControllerTest {
 
     @BeforeEach
     void setup() {
+        // Configura el mock para asignar IDs al guardar usuarios
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            u.setId(System.currentTimeMillis()); // Simula un ID único
+            return u;
+        });
+
         User user = new User();
         user.setFirstName("Test");
         user.setLastName("Student");

@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 @Transactional
@@ -29,7 +32,7 @@ public class NoteCommandServiceImplTest {
     @Autowired
     private ExamRepository examRepository;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
     @Autowired
@@ -43,6 +46,14 @@ public class NoteCommandServiceImplTest {
 
     @BeforeEach
     void init() {
+        // Configura el mock para asignar IDs al guardar usuarios
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User u = invocation.getArgument(0);
+            if (u.getType_user() == 1) u.setId(1L); // Profesor
+            else u.setId(2L); // Estudiante
+            return u;
+        });
+
         // Crear profesor
         User teacher = new User();
         teacher.setFirstName("Juan");
@@ -52,7 +63,7 @@ public class NoteCommandServiceImplTest {
         teacher.setPassword("123456");
         teacher.setType_user(1);
         teacher.setType_plan(1);
-        userRepository.save(teacher);
+        teacher = userRepository.save(teacher);
 
         // Crear curso
         Course course = new Course();
@@ -64,20 +75,20 @@ public class NoteCommandServiceImplTest {
         course.setPrincipal_image("img");
         course.setUrl_video("video");
         course.setTeacherId(teacher.getId());
-        courseRepository.save(course);
+        course = courseRepository.save(course);
 
         // Crear unidad
         Unit unit = new Unit();
         unit.setTitle("Unidad 1");
         unit.setCourse(course);
-        unitRepository.save(unit);
+        unit = unitRepository.save(unit);
 
         // Crear examen
         Exam exam = new Exam();
         exam.setTitle("Examen");
         exam.setCourse(course);
         exam.setUnit(unit);
-        examRepository.save(exam);
+        exam = examRepository.save(exam);
         savedExamId = exam.getId();
 
         // Crear estudiante
@@ -89,7 +100,7 @@ public class NoteCommandServiceImplTest {
         student.setPassword("123456");
         student.setType_user(2);
         student.setType_plan(1);
-        userRepository.save(student);
+        student = userRepository.save(student);
         savedStudentId = student.getId();
     }
 
