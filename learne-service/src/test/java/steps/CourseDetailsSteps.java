@@ -11,12 +11,17 @@ import java.util.List;
 
 public class CourseDetailsSteps {
 
+    private final TestContext context;
     private boolean alumnoLogueado;
     private boolean listaCursosVisible;
     private boolean detallesCursoVisible;
     private boolean cursoExiste;
     private String mensajeError;
     private List<String> detallesMostrados;
+
+    public CourseDetailsSteps(TestContext context) {
+        this.context = context;
+    }
 
     @Dado("el alumno ha iniciado sesión y visualiza la lista de cursos disponibles")
     public void alumnoHaIniciadoSesionYVeLista() {
@@ -84,6 +89,8 @@ public class CourseDetailsSteps {
 
     @Entonces("el sistema muestra un mensaje de {string}")
     public void sistemaMuestraMensajeError(String mensaje) {
-        assertEquals(mensaje, mensajeError, "El mensaje de error no coincide");
+        // Primero verifica el mensaje de error local, si no, usa el del contexto compartido
+        String mensajeActual = mensajeError != null ? mensajeError : context.getMensajeSistema();
+        assertEquals(mensaje, mensajeActual, "El mensaje de error no coincide");
     }
 }
