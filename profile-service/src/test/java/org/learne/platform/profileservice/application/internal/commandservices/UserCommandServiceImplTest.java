@@ -6,23 +6,28 @@ import org.learne.platform.profileservice.application.commandservices.UserComman
 import org.learne.platform.profileservice.domain.model.aggregates.User;
 import org.learne.platform.profileservice.domain.model.commands.CreateUserCommand;
 import org.learne.platform.profileservice.domain.model.commands.UpdateUserCommand;
+import org.learne.platform.profileservice.infrastructure.messaging.UserEventPublisher;
 import org.learne.platform.profileservice.infrastructure.persistence.jpa.UserRepository;
+
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 class UserCommandServiceImplTest {
 
     private UserRepository userRepository;
+    private UserEventPublisher userEventPublisher;
     private UserCommandServiceImpl userCommandService;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
-        userCommandService = new UserCommandServiceImpl(userRepository);
+        userEventPublisher = mock(UserEventPublisher.class);
+        userCommandService = new UserCommandServiceImpl(userRepository, userEventPublisher);
     }
 
     @Test

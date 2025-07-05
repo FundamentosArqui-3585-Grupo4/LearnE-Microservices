@@ -4,6 +4,7 @@ import org.learne.platform.profileservice.domain.model.aggregates.User;
 import org.learne.platform.profileservice.domain.model.commands.CreateUserCommand;
 import org.learne.platform.profileservice.domain.model.commands.UpdateUserCommand;
 import org.learne.platform.profileservice.domain.services.UserCommandService;
+import org.learne.platform.profileservice.infrastructure.messaging.UserEventPublisher;
 import org.learne.platform.profileservice.infrastructure.persistence.jpa.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,15 @@ import java.util.Optional;
 
 @Service
 public class UserCommandServiceImpl implements UserCommandService {
+
     private final UserRepository userRepository;
-    public UserCommandServiceImpl(UserRepository userRepository) {
+    private final UserEventPublisher userEventPublisher;
+
+    public UserCommandServiceImpl(UserRepository userRepository, UserEventPublisher userEventPublisher) {
         this.userRepository = userRepository;
+        this.userEventPublisher = userEventPublisher;
     }
+
     @Override
     public Optional<User> handle(UpdateUserCommand command) {
         var result = userRepository.findById(command.userId());
@@ -38,6 +44,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         var newUser = new User(command);
         try {
             User savedUser = userRepository.save(newUser);
+            userEventPublisher.publishUserCreatedEvent(savedUser); // Publish the user created event
             return savedUser.getId();
         } catch (RuntimeException e) {
             throw new IllegalArgumentException("An error occurred while saving the user " + e.getMessage());
