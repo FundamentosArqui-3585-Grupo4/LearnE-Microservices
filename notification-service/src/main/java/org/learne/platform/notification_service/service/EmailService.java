@@ -4,7 +4,7 @@ import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,12 +15,12 @@ public class EmailService {
     private final String apiKey;
     private final String fromEmail;
 
-    public EmailService() {
-        Dotenv dotenv = Dotenv.configure()
-                .directory("./notification-service")
-                .load();
-        this.apiKey = dotenv.get("SENDGRID_API_KEY");
-        this.fromEmail = dotenv.get("FROM_EMAIL");
+    public EmailService(
+            @Value("${SENDGRID_API_KEY}") String apiKey,
+            @Value("${FROM_EMAIL}") String fromEmail
+    ) {
+        this.apiKey = apiKey;
+        this.fromEmail = fromEmail;
     }
 
     public void sendUserCreatedEmail(String toEmail, String subject, String contentText) {
