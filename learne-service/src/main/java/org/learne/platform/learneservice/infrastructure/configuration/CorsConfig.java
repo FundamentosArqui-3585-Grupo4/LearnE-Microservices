@@ -9,11 +9,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/v1/**")
-                .allowedOriginPatterns(
-                        "https://funda-learne.web.app", // Producción
-                        "http://localhost:4200",        // Desarrollo local con Angular
-                        "http://127.0.0.1:4200"
-                )
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
